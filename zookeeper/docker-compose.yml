@@ -1,0 +1,49 @@
+version: '2'
+
+services:
+  zookeeper:
+    image: bitnami/zookeeper:3.8
+    ports:
+      - '2181'
+    networks:
+      - zoo_net
+    volumes:
+      - zookeeper_data:/bitnami
+    environment:
+      - ZOO_SERVER_ID=1
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_SERVERS=zookeeper:2888:3888,zookeeper2:2888:3888,zookeeper3:2888:3888
+  zookeeper2:
+    image: bitnami/zookeeper:3.8
+    ports:
+      - '2181'
+    networks:
+      - zoo_net
+    volumes:
+      - zookeeper2_data:/bitnami
+    environment:
+      - ZOO_SERVER_ID=2
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_SERVERS=zookeeper:2888:3888,zookeeper2:2888:3888,zookeeper3:2888:3888
+  zookeeper3:
+    image: bitnami/zookeeper:3.8
+    ports:
+      - '2181'
+    networks:
+      - zoo_net
+    volumes:
+      - zookeeper3_data:/bitnami
+    environment:
+      - ZOO_SERVER_ID=3
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_SERVERS=zookeeper:2888:3888,zookeeper2:2888:3888,zookeeper3:2888:3888
+networks:
+  zoo_net:
+    driver: "bridge"
+volumes:
+  zookeeper_data:
+    driver: local
+  zookeeper2_data:
+    driver: local
+  zookeeper3_data:
+    driver: local

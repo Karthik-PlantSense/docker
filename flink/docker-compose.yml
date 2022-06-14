@@ -1,0 +1,52 @@
+version: "2.2"
+services:
+  jobmanager:
+    image: flink:test
+    ports:
+      - "8181:8081"
+    # networks:
+    #   - zookeeper_zoo_net
+    command: jobmanager
+    volumes:
+      - /home/karthik/work/docker/flink/ha:/opt/flink/ha
+      - /home/karthik/work/docker/flink/code:/opt/flink/code
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        parallelism.default: 2
+        high-availability: zookeeper
+        high-availability.zookeeper.path.root: /flink
+        high-availability.cluster-id: /cluster_one
+        high-availability.storageDir: file:///opt/flink/ha
+        high-availability.zookeeper.quorum: zookeeper_zookeeper_1:2181,zookeeper_zookeeper2_1:2181,zookeeper_zookeeper3_1:2181   
+        zookeeper.sasl.disable: true    
+
+  taskmanager:
+    image: flink:test
+    depends_on:
+      - jobmanager
+    # networks:
+    #   - zookeeper_zoo_net
+    command: taskmanager
+    scale: 3
+    volumes:
+      - /home/karthik/work/docker/flink/ha:/opt/flink/ha
+      - /home/karthik/work/docker/flink/code:/opt/flink/code
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        parallelism.default: 2 
+        high-availability: zookeeper
+        high-availability.zookeeper.path.root: /flink
+        high-availability.cluster-id: /cluster_one
+        high-availability.storageDir: file:///opt/flink/ha
+        high-availability.zookeeper.quorum: zookeeper_zookeeper_1:2181,zookeeper_zookeeper2_1:2181,zookeeper_zookeeper3_1:2181
+        zookeeper.sasl.disable: true
+
+networks:
+  default:
+    name: zookeeper_zoo_net
+    external: true
